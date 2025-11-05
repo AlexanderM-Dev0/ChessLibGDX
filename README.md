@@ -1,5 +1,12 @@
 # ChessLibGDX
 
+<p align="center">
+  <img src="Chess/images/gameboard.png" alt="chess game board" width="600">
+  <br>
+  <em>Chess Board</em>
+</p>
+
+
 # Goals
 
 A Chess Board in Java using LibGDX
@@ -12,18 +19,12 @@ A Chess Board in Java using LibGDX
   Moveable Pieces
   
   Taking Pieces
+
+  Undoing moves(Press 'Z')
+
+  Reset the entire board(Press 'R')
   
   Castling (Techinically)
-  
 
-# In Progress
-  Undoing moves
+  Actual Chess Pieces
   
-  Showing Legal Moves
-  
-  Preventing Illegal moves
-  
-  Adding Fonts for Pieces(Pieces are currently represented as Unique Integer Values)
-  
-
-
