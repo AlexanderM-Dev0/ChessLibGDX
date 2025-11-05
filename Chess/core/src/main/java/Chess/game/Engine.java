@@ -27,7 +27,7 @@ public class Engine
     Black = (White + 6)
      */
 
-    //https://www.namecheap.com/visual/font-generator/chess-symbols/
+    //Used Hiero v5 to generate the proper .fnt and .png assets
 
 
     private int tileSelectedIndex = -1;
@@ -37,16 +37,13 @@ public class Engine
     public ArrayList<Square> initializeBoard(ArrayList<Square> board)
     {
         board = new ArrayList<Square>();
-        // "1,2,3,4,5,3,2,1,6,6,6,6,6,6,6,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,12,12,12,12,12,12,12,12,7,8,9,10,11,9,8,7"
         String fen = "1,2,3,4,5,3,2,1,6,6,6,6,6,6,6,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,12,12,12,12,12,12,12,12,7,8,9,10,11,9,8,7";
         turnHistory.add(fen);
         System.out.print(fen);
         String[] delimentedFen = fen.split(",");
         for(int i = 0; i < 64; i++)
         {
-            //board.add(new Square(i,i%8+1, Integer.parseInt(delimentedFen[i])));
             board.add(new Square(200+(i%8)*Square.size + Square.size/2,50+(i/8)*Square.size, Integer.parseInt(delimentedFen[i])));
-            //System.out.println((i%8 + 1) + ", " + (i/8 + 1) + " = " + Integer.parseInt(delimentedFen[i]));
         }
         return board;
     }
@@ -75,10 +72,10 @@ public class Engine
         return boardToString;
     }
 
-    public boolean timeCheck()
+    public boolean timeCheck(int variation)
     {
         boolean check = false;
-        if(System.currentTimeMillis() > lastInput+500)
+        if(System.currentTimeMillis() > lastInput+variation)
         {
             lastInput = System.currentTimeMillis();
             check = true;
@@ -89,7 +86,7 @@ public class Engine
 
     public void selectionCheck(ArrayList<Square> board, OrthographicCamera cam)
     {
-        if(Gdx.input.isButtonPressed(Input.Buttons.LEFT) &&  timeCheck())
+        if(Gdx.input.isButtonPressed(Input.Buttons.LEFT) &&  timeCheck(500))
         {
             lastInput = System.currentTimeMillis();
             if(tileSelectedIndex == -1)
@@ -101,7 +98,6 @@ public class Engine
                     if (board.get(i).isClicked(mousePos)) {
                         board.get(i).isSelected = true;
                         tileSelectedIndex = i;
-
                     }
                 }
             }
@@ -121,8 +117,6 @@ public class Engine
                     }
                 }
             }
-
-
         }
         if(Gdx.input.isButtonPressed(Input.Buttons.RIGHT))
         {
@@ -145,11 +139,8 @@ public class Engine
                     return true;
                 }
             }
-
         }
-
         return false;
-
     }
     public boolean turn(ArrayList<Square> board, boolean turn)
     {
@@ -173,62 +164,77 @@ public class Engine
         }
         return board2;
     }
+    private String getAsciiPiece(int piece)
+    {
+        // Unicode chess symbols (white: 1–6, black: 7–12)
+        switch (piece)
+        {
+            case 1:  return "♖"; // White Rook
+            case 2:  return "♘"; // White Knight
+            case 3:  return "♗"; // White Bishop
+            case 4:  return "♕"; // White Queen
+            case 5:  return "♔"; // White King
+            case 6:  return "♙"; // White Pawn
+            case 7:  return "♜"; // Black Rook
+            case 8:  return "♞"; // Black Knight
+            case 9:  return "♝"; // Black Bishop
+            case 10: return "♛"; // Black Queen
+            case 11: return "♚"; // Black King
+            case 12: return "♟"; // Black Pawn
+            default: return "";
+        }
+    }
 
     public void drawBoard(ArrayList<Square> board, ShapeRenderer shapeRenderer, SpriteBatch batch)
     {
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-        shapeRenderer.setColor(0f,0,0,1f);
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         int startX = 200;
         int startY = 50;
-        BitmapFont font = new BitmapFont();
-        font.setColor(Color.RED);
-        batch.begin();
-        for(int i = 0; i < 64; i++)
-        {
-            if(!board.get(i).isSelected)
-            {
-                shapeRenderer.rect(board.get(i).x, board.get(i).y, Square.size,Square.size);
-            }
-            if(board.get(i).piece != 0)
-            {
-                if(board.get(i).piece >= 7)
-                {
-                    font.setColor(Color.BLACK);
-                }
-                else
-                {
-                    font.setColor(Color.WHITE);
-                }
-                font.draw(batch, board.get(i).piece+"", board.get(i).x + Square.size/2 , board.get(i).y + Square.size/2);
 
-            }
-        }
-        for(int i = 0; i < 64; i++)
+        for (int i = 0; i < 64; i++)
         {
-            if(board.get(i).isSelected)
-            {
-                shapeRenderer.setColor(1f,0,0,1f);
-                shapeRenderer.rect(board.get(i).x, board.get(i).y, Square.size,Square.size);
-                shapeRenderer.setColor(0f,0,0,1f);
-                if(board.get(i).piece >= 7)
-                {
-                    font.setColor(Color.BLACK);
-                }
-                else
-                {
-                    font.setColor(Color.WHITE);
-                }
-                if(board.get(i).piece != 0)
-                {
-                    font.draw(batch, board.get(i).piece+"", board.get(i).x + Square.size/2 , board.get(i).y + Square.size/2);
-                }
-            }
+            int row = i / 8;
+            int col = i % 8;
 
+            if ((row + col) % 2 == 0)
+                shapeRenderer.setColor(Color.GRAY);
+            else
+                shapeRenderer.setColor(new Color(0.25f, 0.25f, 0.3f, 1f));
+
+            if (!board.get(i).isSelected)
+                shapeRenderer.rect(board.get(i).x, board.get(i).y, Square.size, Square.size);
         }
-        batch.end();
 
         shapeRenderer.end();
+
+
+        BitmapFont font = new BitmapFont(Gdx.files.internal("fonts/unicode.fnt"));
+        font.getData().setScale(1.5f);
+
+        batch.begin();
+
+        for (int i = 0; i < 64; i++)
+        {
+            int piece = board.get(i).piece;
+            if (piece != 0)
+            {
+                boolean isBlackPiece = (piece >= 7);
+                String symbol = getAsciiPiece(piece);
+
+                //Neat little trick
+                Color outlineColor = isBlackPiece ? Color.WHITE : Color.BLACK;
+                //I put a double outline here for more clarity
+                font.setColor(outlineColor);
+                font.draw(batch, symbol, board.get(i).x + Square.size / 2f - 9, board.get(i).y + Square.size / 2f + 9);
+                font.draw(batch, symbol, board.get(i).x + Square.size / 2f - 11, board.get(i).y + Square.size / 2f + 11);
+
+                font.setColor(isBlackPiece ? Color.BLACK : Color.WHITE);
+                font.draw(batch, symbol, board.get(i).x + Square.size / 2f - 10, board.get(i).y + Square.size / 2f + 10);
+            }
+        }
+        batch.end();
     }
+
     public void renderMouse(ShapeRenderer shapeRenderer)
     {
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
@@ -238,8 +244,5 @@ public class Engine
         }
         shapeRenderer.end();
     }
-
-
-
 
 }
