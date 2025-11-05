@@ -49,12 +49,18 @@ public class main extends ApplicationAdapter {
         Gdx.gl.glClearColor(0.15f, 0.15f, 0.2f, 1f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        if(Gdx.input.isKeyPressed(Input.Keys.Z) && engine.timeCheck())        //Jump
+        if(Gdx.input.isKeyPressed(Input.Keys.Z) && engine.timeCheck(500))        //Jump
         {
             System.out.println(board.get(0).piece);
             System.out.println("Undid");
             board = engine.setBoard(board);
             System.out.println("Position 1: " + board.get(0).piece);
+        }
+        if(Gdx.input.isKeyPressed(Input.Keys.R) && engine.timeCheck(200))        //Jump
+        {
+            board = engine.initializeBoard(board);
+            System.out.println("Table Flipped");
+
 
         }
         engine.selectionCheck(board, extendCam);
